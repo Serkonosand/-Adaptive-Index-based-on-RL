@@ -31,7 +31,7 @@ class QLearningTable:
         self.check_state_exist(s_)
         q_predict = self.q_table.loc[s, a]
         # there is no terminal state in this environment
-        q_target = r + self.gamma * self.q_table.loc[s_, :].max()  
+        q_target = r + self.gamma * self.q_table.loc[s_, :].max()
         self.q_table.loc[s, a] += self.lr * (q_target - q_predict)  # update
 
     def check_state_exist(self, state):
@@ -39,10 +39,11 @@ class QLearningTable:
             # append new state to q table
             self.q_table = self.q_table.append(
                 pd.Series(
-                    [0]*len(self.actions),
+                    [0] * len(self.actions),
                     index=self.q_table.columns,
                     name=state,
                 )
             )
+
     def print_qtable(self):
         print(self.q_table)
