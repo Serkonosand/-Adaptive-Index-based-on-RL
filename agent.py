@@ -7,5 +7,5 @@ class Agent:
         self.reinLearning = QLearningTable(agentAction)
         self.dbAction = DatabaseAction()
 
-    def training(self,):
+    def training(self):
         pass

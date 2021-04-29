@@ -6,5 +6,8 @@ class Action:
         # Database instance
         self.db = Database()
 
-    def excute(self, table, type):
-        self.db.modif_index(table, type)
+    def modif(self, table, type, column):
+        self.db.modif_index(table, type, column)
+
+    def create(self, table, type, column):
+        self.db.create_index_table(table, type, column)
