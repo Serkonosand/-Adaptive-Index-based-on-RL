@@ -4,8 +4,8 @@ class Benchmark:
     def __init__(self, fpath):
         self.path = fpath
 
-    def query_read():
+    def query_read(self):
         pass
 
-    def query_write():
+    def query_write(self):
         pass

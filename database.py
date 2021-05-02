@@ -3,7 +3,7 @@ from psycopg2 import sql
 
 class Database:
     
-    tables = {}
+    # tables = {}
 
     def __init__(self):
         self.dbname = "rltestdb"
@@ -25,7 +25,7 @@ class Database:
 
     def modif_index(self, table, type, column):
         cmd0 = sql.SQL("DROP INDEX {idx_name}").format(idx_name=sql.Identifier(self.idxname))
-        if type = 'HASH':
+        if type = 'hash':
             cmd1 = sql.SQL("CREATE INDEX {idx_name} ON {table_name} USING HASH ({column_name})").format(
                 idx_name=sql.Identifier(self.idxname), 
                 table_name = sql.Identifier(table), 
@@ -89,6 +89,19 @@ class Database:
         conn.close()
         print('Created index on (%s) %s' % (table, column))
 
+    def query_excute(self, query):
+        conn = psycopg2.connet(database=self.dbname, user=self.username, password=self.pswd, host=self.hst, port=self.port)
+        cursor = conn.cursor()
+        # time
+        cursor.execute(query)
+        # time
+        rows = cur.fetchall()        # all rows in table
+        print(rows)
+        for i in rows:
+            print(i)
+        conn.commit()
+        cur.close()
+        conn.close()
 
  if __name__ == '__main__':
     pass       
