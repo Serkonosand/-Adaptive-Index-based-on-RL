@@ -41,6 +41,9 @@ class Agent:
                 print("index structure:" + indexType + "\n")
                 self.env.updata_index_structure(table, indexType, column)
                 self.env.env_query_excute()
+        """
+            moniter off
+        """
         else if sign == 'off':
             while True:
                 self.env.env_query_excute()
