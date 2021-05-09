@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import sql
 import time
-
+FILEPATH = '.\\testdata\\city.txt'
 
 class Database:
 
@@ -13,8 +13,8 @@ class Database:
         self.pswd = "ssh0511"
         self.hst = "127.0.0.1"
         self.port = "5432"
-        self.idxname = "idx_0"
-        self.tablename = "test0"
+        self.idxname = "idx_1"
+        self.tablename = "city"
 
     def modif_index(self, table, type, column):
         cmd0 = sql.SQL("DROP INDEX {idx_name}").format(idx_name=sql.Identifier(self.idxname))
@@ -45,31 +45,24 @@ class Database:
             print("Didn't create index on %s, error %s" % (column, ex))
 
     def create_table(self):
+        cmd = sql.SQL("CREATE TABLE {table_name}(id serial PRIMARY KEY, city_name varchar, population int, "
+                      "country_name varchar, state_name varchar)").format(
+            table_name=sql.Identifier(self.tablename)
+        )
+        with open(FILEPATH, 'r') as f:
+            q = f.read()
+        print(q)
         try:
             conn = psycopg2.connect(database=self.dbname, user=self.username, password=self.pswd, host=self.hst,
                                     port=self.port)
             cur = conn.cursor()
             print("connect correct!\n")
-            cmd = sql.SQL("CREATE TABLE {table_name}(id serial PRIMARY KEY, num integer,data varchar)").format(
-                table_name=sql.Identifier(self.tablename)
-            )
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(self.tablename)))
             cur.execute(cmd)
             print("create table correct!\n")
             # insert one item
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (1, 'aaa'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (2, 'bbb'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (3, 'ccc'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (4, 'ddd'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (5, 'eee'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (6, 'fff'))
-            cur.execute("INSERT INTO test0(num, data)VALUES(%s, %s)", (7, 'ggg'))
+            cur.execute(q)
             print("create query correct!\n")
-            cur.execute("SELECT * FROM test0;")
-            print("get query correct!\n")
-            rows = cur.fetchall()  # all rows in table
-            print(rows)
-            for i in rows:
-                print(i)
             conn.commit()
             cur.close()
             conn.close()
@@ -99,9 +92,9 @@ class Database:
             conn.close()
             print('Created index on (%s) %s' % (table, column))
         except psycopg2.Error as ex:
-            print('sth error')
+            print('sth error: ' + ex.pgcode)
 
-    def query_excute(self, query):
+    def query_execute(self, query):
         try:
             conn = psycopg2.connect(database=self.dbname, user=self.username, password=self.pswd, host=self.hst,
                                     port=self.port)
@@ -110,10 +103,9 @@ class Database:
             # time start
             start_time = time.perf_counter()
             cursor.execute(query)
-            excuteTime = time.perf_counter() - start_time
-            print(excuteTime)
-            # time end
             rows = cursor.fetchall()  # all rows in table
+            executeTime = time.perf_counter() - start_time
+            # time end
             conn.commit()
             cursor.close()
             conn.close()
@@ -121,18 +113,18 @@ class Database:
             for i in rows:
                 print(i)
             print('\n')
-            return excuteTime
+            return executeTime
         except psycopg2.Error as ex:
-            print('sth error \n')
+            print('sth error \n' + ex.pgcode)
 
 
 if __name__ == '__main__':
     db = Database()
-    #    db.create_table()
-    #    db.create_index_table('test0', 'b+tree', 'data')
+    db.create_table()
+    db.create_index_table('city', 'b+tree', 'population')
     #    db.modif_index('test0', 'b+tree', 'data')
-    # Q = "SELECT * FROM test0 WHERE data = 'bbb' "
+#    Q = "SELECT * FROM city"
     # start_time = time.process_time()
-    # excuteTime = db.query_excute(Q)
-    # excuteTime = time.process_time() - start_time
-    # print(excuteTime)
+    # executeTime = db.query_execute(Q)
+    # executeTime = time.process_time() - start_time
+#    print(db.query_execute(Q))

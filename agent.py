@@ -1,6 +1,7 @@
 from RL_main import QLearningTable
 from environment import Environment
 
+
 class Agent:
     def __init__(self, agentAction):
         self.reinLearning = QLearningTable(agentAction)
@@ -8,9 +9,11 @@ class Agent:
         self.e = 5
 
     def training(self, envTypeArray):
+        # initial structure
+        # structure : hash or B+tree
+        structure = self.env.reset()
         for episode in range(self.e):
             # initial structure
-            # structure : hash or B+tree
             structure = self.env.reset()
             # envTypeArray : query type array
             for i in range(len(envTypeArray)):
@@ -27,31 +30,41 @@ class Agent:
                 # swap structure
                 structure = structure_
                 # print(i, structure)
-            print("agent training epsode "+episode+" finished"+"\n")
+            print("agent training epsode " + str(episode) + " finished" + "\n")
         return structure
-    
+
     def moniter(self, sign, table, column):
         """
             moniter open
         """
         if sign == 'open':
-            while True:
-                envTypeArray = self.env.env_type_array()
+            num = 0
+            while self.env.env_query_execute(num):
+                envTypeArray = self.env.env_type_array(num)
                 indexType = self.training(envTypeArray)
                 print("index structure:" + indexType + "\n")
-                self.env.updata_index_structure(table, indexType, column)
-                self.env.env_query_excute()
-        """
-            moniter off
-        """
-        else if sign == 'off':
-            while True:
-                self.env.env_query_excute()
+                self.env.update_index_structure(table, indexType, column)
+                num += 1
+        # moniter off
+        elif sign == 'off':
+            num = 0
+            totalTime = 0
+            while 1:
+                result = self.env.env_query_execute(num)
+                if result > 0:
+                    num += 1
+                    totalTime += result
+                else:
+                    break
+            print("execute finished \n")
+            print("total execute time :" + str(totalTime))
         else:
             print("signal not exist! \n")
 
 
 if __name__ == '__main__':
     actions = ['toB+tree', 'toHash']
-    Moniter  = Agent(actions)
-    Moniter.moniter('open', table, column)
+    Moniter = Agent(actions)
+    table = 'city'
+    column = 'population'
+    Moniter.moniter('off', table, column)

@@ -1,7 +1,7 @@
-import random
 from database import Database
 from benchmark import Benchmark
-BENCHMARK_FILE_DATAPATH = ""
+
+BENCHMARK_FILE_DATAPATH = "./testdata/workload.txt"
 
 
 class Environment:
@@ -11,14 +11,12 @@ class Environment:
         self.preIndStructure = 'b+tree'
         self.db = Database()
         self.bm = Benchmark(BENCHMARK_FILE_DATAPATH)
-
-    def __get_query(self):
-        return self.bm.query_read()
+        self.qlines = self.bm.query_read()
 
     def reset(self):
         return self.structure[1]
 
-    def updata_index_structure(self, table, type, column):
+    def update_index_structure(self, table, type, column):
         if type == self.preIndStructure:
             pass
         else:
@@ -35,11 +33,11 @@ class Environment:
         """
         if A == 'toHash':
             if S[1] == 0:
-                if S[0] == 'b+tree':
+                if S[0] == self.structure[1]:
                     S_ = S
-                    S_[0] = 'hash'
+                    S_[0] = self.structure[0]
                     R = 0
-                elif S[0] == 'hash':
+                elif S[0] == self.structure[0]:
                     S_ = S
                     R = 1
                 else:
@@ -50,11 +48,11 @@ class Environment:
                 R = 0
         elif A == 'toB+tree':
             if S[1] == 1:
-                if S[0] == 'hash':
+                if S[0] == self.structure[0]:
                     S_ = S
-                    S_[0] = 'b+tree'
+                    S_[0] = self.structure[1]
                     R = 0
-                elif S[0] == 'b+tree':
+                elif S[0] == self.structure[1]:
                     S_ = S
                     R = 1
                 else:
@@ -68,13 +66,17 @@ class Environment:
             R = 0
         return S_, R
 
-    def env_type_array(self):
+    def env_type_array(self, i):
         pass
-    
-    def env_query_excute(self):
-        q = self.__get_query()
-        print("excute query: "+ q + "\n")
-        self.db.query_excute(q)
 
-    
-    
+    def env_query_execute(self, i):
+
+        if i < len(self.qlines):
+            print("execute query: " + self.qlines[i] + "\n")
+            return self.db.query_execute(self.qlines[i])
+        else:
+            return -1
+
+
+if __name__ == '__main__':
+    env = Environment()
