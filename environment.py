@@ -2,6 +2,7 @@ from database import Database
 from benchmark import Benchmark
 
 BENCHMARK_FILE_DATAPATH = "./testdata/workload.txt"
+MAX_STATE_SIZE = 200
 
 
 class Environment:
@@ -12,6 +13,8 @@ class Environment:
         self.db = Database()
         self.bm = Benchmark(BENCHMARK_FILE_DATAPATH)
         self.qlines = self.bm.query_read()
+        with open("./testdata/data.txt", 'r') as f:
+            self.labellines = [line.rstrip('\n') for line in f]
 
     def reset(self):
         return self.structure[1]
@@ -45,7 +48,7 @@ class Environment:
                     R = 0
             else:
                 S_ = S
-                R = 0
+                R = -1
         elif A == 'toB+tree':
             if S[1] == 1:
                 if S[0] == self.structure[0]:
@@ -60,17 +63,19 @@ class Environment:
                     R = 0
             else:
                 S_ = S
-                R = 0
+                R = -1
         else:
             S_ = S
             R = 0
         return S_, R
 
-    def env_type_array(self, i):
-        pass
+    def env_label_array(self, i):
+        if i < MAX_STATE_SIZE:
+            return self.labellines[0:i+1]
+        else:
+            return self.labellines[i+1-MAX_STATE_SIZE:i+1]
 
     def env_query_execute(self, i):
-
         if i < len(self.qlines):
             print("execute query: " + self.qlines[i] + "\n")
             return self.db.query_execute(self.qlines[i])

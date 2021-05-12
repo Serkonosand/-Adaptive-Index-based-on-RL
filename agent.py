@@ -6,7 +6,7 @@ class Agent:
     def __init__(self, agentAction):
         self.reinLearning = QLearningTable(agentAction)
         self.env = Environment()
-        self.e = 5
+        self.e = 4
 
     def training(self, envTypeArray):
         # initial structure
@@ -39,12 +39,20 @@ class Agent:
         """
         if sign == 'open':
             num = 0
-            while self.env.env_query_execute(num):
-                envTypeArray = self.env.env_type_array(num)
-                indexType = self.training(envTypeArray)
-                print("index structure:" + indexType + "\n")
-                self.env.update_index_structure(table, indexType, column)
-                num += 1
+            totalTime = 0
+            while 1:
+                result = self.env.env_query_execute(num)
+                if result == -1:
+                    break
+                else:
+                    envTypeArray = self.env.env_label_array(num)
+                    indexType = self.training(envTypeArray)
+                    print("index structure:" + indexType + "\n")
+                    self.env.update_index_structure(table, indexType, column)
+                    num += 1
+                    totalTime += result
+            print("execute finished \n")
+            print("total execute time :" + str(totalTime))
         # moniter off
         elif sign == 'off':
             num = 0
@@ -67,4 +75,4 @@ if __name__ == '__main__':
     Moniter = Agent(actions)
     table = 'city'
     column = 'population'
-    Moniter.moniter('off', table, column)
+    Moniter.moniter('open', table, column)

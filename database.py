@@ -110,9 +110,11 @@ class Database:
             cursor.close()
             conn.close()
             print("get query correct!\n")
+            """
             for i in rows:
                 print(i)
             print('\n')
+            """
             return executeTime
         except psycopg2.Error as ex:
             print('sth error \n' + ex.pgcode)
@@ -120,9 +122,7 @@ class Database:
 
 if __name__ == '__main__':
     db = Database()
-    db.create_table()
-    db.create_index_table('city', 'b+tree', 'population')
-    #    db.modif_index('test0', 'b+tree', 'data')
+    db.modif_index('city', 'b+tree', 'population')
 #    Q = "SELECT * FROM city"
     # start_time = time.process_time()
     # executeTime = db.query_execute(Q)
